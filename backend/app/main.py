@@ -1,11 +1,12 @@
-
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.config import settings
 from app.routes.health import router as health_router
 from app.routes.image import router as image_router
+from app.routes.video import router as video_router
 from app.services.clip_service import load_clip_model
 
 
@@ -21,15 +22,15 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="CrimeScene API",
-    description="CLIP-Based Video and Image Analysis with Visual Counterfactual Intelligence",
-    version="1.0.0",
+    title=settings.APP_TITLE,
+    description=settings.APP_DESCRIPTION,
+    version=settings.APP_VERSION,
     lifespan=lifespan
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -37,11 +38,13 @@ app.add_middleware(
 
 app.include_router(health_router, prefix="/api", tags=["Health"])
 app.include_router(image_router, prefix="/api", tags=["Image Analysis"])
+app.include_router(video_router, prefix="/api", tags=["Video Analysis"])
 
 
-@app.get("/")
+@app.get("/", tags=["Root"])
 def root():
     return {
-        "message": "Welcome to CrimeScene API",
+        "message": f"Welcome to {settings.APP_TITLE}",
+        "version": settings.APP_VERSION,
         "docs": "/docs"
     }

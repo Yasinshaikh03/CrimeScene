@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { Activity, ArrowUp, ArrowUpRight, Check, ChevronDown, CircleHelp, FileImage, Fingerprint, LoaderCircle, LockKeyhole, Plus, RefreshCw, ScanSearch, ShieldCheck, Sparkles, Trash2, UploadCloud, X } from 'lucide-react';
+import { Activity, ArrowUp, ArrowUpRight, Check, ChevronDown, CircleHelp, FileImage, Fingerprint, LoaderCircle, LockKeyhole, Plus, RefreshCw, ScanSearch, ShieldCheck, Sparkles, Trash2, UploadCloud, X } from './icons';
 import { analyzeImage, checkServiceHealth, useMocks } from './api';
 import type { AnalysisResponse, VciCell } from './mockData';
+import './App.css';
+import './vci.css';
 
 const starterDescriptions = [
   'A person walking through a building',
@@ -9,7 +11,7 @@ const starterDescriptions = [
   'A person leaving a building',
   'A person standing near a vehicle',
 ];
-const MAX_SIZE = 20 * 1024 * 1024;
+const MAX_SIZE = 10 * 1024 * 1024;
 const ACCEPTED = ['image/jpeg', 'image/png'];
 
 function formatSize(bytes: number) {
@@ -18,6 +20,7 @@ function formatSize(bytes: number) {
 
 function App() {
   const inputRef = useRef<HTMLInputElement>(null);
+  const previewUrlRef = useRef('');
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState('');
   const [descriptions, setDescriptions] = useState(starterDescriptions);
@@ -28,24 +31,31 @@ function App() {
   const [selected, setSelected] = useState(0);
   const [selectedCell, setSelectedCell] = useState(0);
   const [serviceOnline, setServiceOnline] = useState(false);
+  const selectedOriginal = response?.results[selected]?.score ?? 0;
 
   useEffect(() => {
     if (!useMocks) void checkServiceHealth().then(setServiceOnline);
   }, []);
 
-  useEffect(() => {
-    if (!image) { setPreview(''); return; }
-    const url = URL.createObjectURL(image);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [image]);
+  useEffect(() => () => {
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+  }, []);
 
   function acceptFile(file?: File) {
     if (!file) return;
     setError(''); setResponse(null);
     if (!ACCEPTED.includes(file.type)) { setError('This file type is not supported. Choose a JPG, JPEG, or PNG image.'); return; }
-    if (file.size > MAX_SIZE) { setError('This image is larger than 20 MB. Choose a smaller file to continue.'); return; }
+    if (file.size > MAX_SIZE) { setError('This image is larger than 10 MB. Choose a smaller file to continue.'); return; }
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+    previewUrlRef.current = URL.createObjectURL(file);
+    setPreview(previewUrlRef.current);
     setImage(file);
+  }
+
+  function removeImage() {
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+    previewUrlRef.current = '';
+    setPreview(''); setImage(null); setResponse(null);
   }
 
   function updateDescription(index: number, value: string) {
@@ -79,26 +89,26 @@ function App() {
         <div className="breadcrumbs"><span>Workspace</span><span className="crumb-slash">/</span><strong>Photo analysis</strong><span className="crumb-tag">IMAGE</span></div>
         <section className="page-heading" id="analysis">
           <div><div className="eyebrow"><span className="eyebrow-line" /> VISUAL INTELLIGENCE</div><h1>Photo analysis</h1><p className="intro">Explore how an image aligns with natural-language descriptions using CLIP similarity.</p></div>
-          <div className={`service-pill ${loading ? 'service-working' : ''}`}><span className="service-dot" />{loading ? 'Analysis in progress' : useMocks ? 'Mock mode active' : serviceOnline ? 'Analysis service online' : 'Analysis service unavailable'}<ChevronDown size={14} /></div>
+          <div className={`service-pill ${loading ? 'service-working' : ''} ${useMocks ? 'service-mock' : serviceOnline ? '' : 'service-offline'}`}><span className="service-dot" />{loading ? 'Analysis in progress' : useMocks ? 'Mock mode active' : serviceOnline ? 'Analysis service online' : 'Analysis service unavailable'}<ChevronDown size={14} /></div>
         </section>
 
         <div className="notice"><ShieldCheck size={17} /><p><strong>For research and exploration.</strong> Similarity scores reflect image–text alignment only. They are not probabilities, proof of crime, or evidence of intent.</p><button aria-label="More about score interpretation" title="Scores are relative similarity values, not probabilities."><CircleHelp size={16} /></button></div>
 
         <div className="workspace-grid">
           <section className="panel upload-panel">
-            <div className="section-head"><div className="step-number">01</div><div><h2>Source image</h2><p>Choose a photo to examine</p></div><span className="section-meta">JPG · PNG <span>MAX 20 MB</span></span></div>
+            <div className="section-head"><div className="step-number">01</div><div><h2>Source image</h2><p>Choose a photo to examine</p></div><span className="section-meta">JPG · PNG <span>MAX 10 MB</span></span></div>
             {!image ? <div className={`dropzone ${dragging ? 'dropzone-active' : ''}`} onDragOver={(e) => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={(e) => { e.preventDefault(); setDragging(false); acceptFile(e.dataTransfer.files[0]); }}>
               <input ref={inputRef} type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" className="visually-hidden" aria-label="Choose a JPG or PNG image" onChange={(e) => acceptFile(e.target.files?.[0])} />
               <div className="upload-icon"><UploadCloud size={22} /></div><p className="drop-title">Drop your image here</p><p className="drop-copy">or <button className="text-button" onClick={() => inputRef.current?.click()}>browse files</button> from your device</p><span className="drop-footnote">Your image stays in this session</span>
-            </div> : <div className="image-card"><div className="image-preview-wrap"><img src={preview} alt={`Preview of ${image.name}`} /><div className="image-overlay"><span><Check size={14} /> Image ready</span><button onClick={() => { setImage(null); setResponse(null); }} aria-label="Remove image"><Trash2 size={15} /></button></div></div><div className="file-details"><div className="file-icon"><FileImage size={17} /></div><div className="file-copy"><strong title={image.name}>{image.name}</strong><span>{formatSize(image.size)} <i /> PNG / JPG</span></div><button className="replace-button" onClick={() => inputRef.current?.click()}><RefreshCw size={13} /> Replace</button><input ref={inputRef} type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" className="visually-hidden" aria-label="Replace image" onChange={(e) => acceptFile(e.target.files?.[0])} /></div></div>}
+            </div> : <div className="image-card"><div className="image-preview-wrap"><img src={preview} alt={`Preview of ${image.name}`} /><div className="image-overlay"><span><Check size={14} /> Image ready</span><button onClick={removeImage} aria-label="Remove image"><Trash2 size={15} /></button></div></div><div className="file-details"><div className="file-icon"><FileImage size={17} /></div><div className="file-copy"><strong title={image.name}>{image.name}</strong><span>{formatSize(image.size)} <i /> PNG / JPG</span></div><button className="replace-button" onClick={() => inputRef.current?.click()}><RefreshCw size={13} /> Replace</button><input ref={inputRef} type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" className="visually-hidden" aria-label="Replace image" onChange={(e) => acceptFile(e.target.files?.[0])} /></div></div>}
             <div className="upload-foot"><span><LockKeyhole size={13} /> Processed securely</span><span>Supported: JPEG, PNG</span></div>
           </section>
 
           <section className="panel descriptions-panel">
             <div className="section-head"><div className="step-number">02</div><div><h2>Compare descriptions</h2><p>What might be happening in this image?</p></div><span className="count-badge">{descriptions.length} prompts</span></div>
-            <p className="instructions">Write clear, neutral descriptions. CLIP compares each one with the image.</p>
-            <div className="description-list">{descriptions.map((description, index) => <div className="description-row" key={index}><span className="row-index">{String(index + 1).padStart(2, '0')}</span><textarea value={description} onChange={(e) => updateDescription(index, e.target.value)} rows={1} aria-label={`Description ${index + 1}`} placeholder="Describe a scene..." /><button className="icon-button remove-button" aria-label={`Remove description ${index + 1}`} onClick={() => { setDescriptions((items) => items.filter((_, i) => i !== index)); setResponse(null); }} disabled={descriptions.length <= 1}><X size={15} /></button></div>)}</div>
-            <button className="add-description" onClick={() => { setDescriptions((items) => [...items, '']); setResponse(null); }}><Plus size={15} /> Add description</button>
+            <p className="instructions">Write clear, neutral descriptions. Up to 20 prompts, 500 characters each.</p>
+            <div className="description-list">{descriptions.map((description, index) => <div className="description-row" key={index}><span className="row-index">{String(index + 1).padStart(2, '0')}</span><textarea value={description} onChange={(e) => updateDescription(index, e.target.value)} rows={1} maxLength={500} aria-label={`Description ${index + 1}`} placeholder="Describe a scene..." /><button className="icon-button remove-button" aria-label={`Remove description ${index + 1}`} onClick={() => { setDescriptions((items) => items.filter((_, i) => i !== index)); setResponse(null); }} disabled={descriptions.length <= 1}><X size={15} /></button></div>)}</div>
+            <button className="add-description" onClick={() => { setDescriptions((items) => [...items, '']); setResponse(null); }} disabled={descriptions.length >= 20}><Plus size={15} /> Add description</button>
             <div className="prompt-tip"><Sparkles size={14} /><span>Tip</span> Try describing different actions or details to compare how they align.
             </div>
           </section>
@@ -114,15 +124,17 @@ function App() {
           {useMocks && <div className="mock-notice"><Sparkles size={14} /><span>Illustrative mock values for interface review. These are not model results.</span></div>}
           <div className="result-layout">
             <div className="panel score-panel"><div className="result-card-heading"><div><h3>Ranked descriptions</h3><p>Higher scores indicate closer alignment</p></div><span className="score-label">SIMILARITY</span></div>
-              <div className="rank-list">{response.results.map((item, index) => <button className={`rank-row ${selected === index ? 'rank-selected' : ''}`} key={`${index}-${item.description}`} onClick={() => setSelected(index)}><span className="rank-number">{String(index + 1).padStart(2, '0')}</span><span className="rank-content"><span className="rank-description">{item.description || 'Untitled description'}</span><span className="bar-track"><span className="bar-fill" style={{ width: `${Math.max(item.score / Math.max(response.results[0]?.score || 1, 0.001) * 100, 4)}%` }} /></span></span><span className="score-value">{item.score.toFixed(3)}</span><ArrowUpRight size={14} className="rank-arrow" /></button>)}</div>
-              <div className="result-explainer"><CircleHelp size={14} /><p>Scores represent similarity, not confidence or probability. Small score differences should be interpreted cautiously.</p></div>
+              <div className="rank-list">{response.results.map((item, index) => <button className={`rank-row ${selected === index ? 'rank-selected' : ''}`} key={`${index}-${item.description}`} onClick={() => setSelected(index)}><span className="rank-number">{String(index + 1).padStart(2, '0')}</span><span className="rank-content"><span className="rank-description">{item.description || 'Untitled description'}</span><span className="bar-track"><span className="bar-fill" style={{ width: `${relativeWidth(response.results.map((result) => result.score), item.score)}%` }} /></span></span><span className="score-value">{item.score.toFixed(4)}</span><ArrowUpRight size={14} className="rank-arrow" /></button>)}</div>
+              <div className="result-explainer"><CircleHelp size={14} /><p>{useMocks ? 'Scores represent similarity, not confidence or probability. Small score differences should be interpreted cautiously.' : response.note || 'Similarity scores are not probabilities or proof of an event.'}</p></div>
             </div>
             <div className="panel vci-panel"><div className="result-card-heading"><div><h3>Region contribution</h3><p>How masking a region changes similarity</p></div><span className="vci-mark"><Sparkles size={12} /> VCI</span></div>
-              <div className="heatmap-wrap">{preview ? <img src={preview} alt="Selected image with region contribution grid overlay" /> : null}<div className="heatmap-grid">{response.vci.map((cell, index) => { const change = response.originalSimilarity - cell.maskedSimilarity; return <button key={`${cell.row}-${cell.column}`} onClick={() => setSelectedCell(index)} className={`heat-cell ${change > 0 ? 'heat-positive' : 'heat-negative'} ${selectedCell === index ? 'heat-selected' : ''}`} style={{ opacity: 0.20 + Math.min(Math.abs(change) * 4, 0.62) }} title={`Row ${cell.row}, column ${cell.column}: original ${response.originalSimilarity.toFixed(3)}, masked ${cell.maskedSimilarity.toFixed(3)}, change ${change > 0 ? '+' : ''}${change.toFixed(3)}`} aria-label={`Row ${cell.row}, column ${cell.column}; score change ${change > 0 ? 'positive' : 'negative'} ${Math.abs(change).toFixed(3)}`} />; })}</div><span className="grid-caption">4 × 4 region grid</span></div>
-              <div className="legend"><span><i className="legend-positive" /> Positive change</span><span><i className="legend-negative" /> Negative change</span></div>
-              <div className="vci-stats"><div><span>ORIGINAL SIMILARITY</span><strong>{response.originalSimilarity.toFixed(3)}</strong></div><div><span>MASKED SIMILARITY</span><strong>{response.vci[selectedCell]?.maskedSimilarity.toFixed(3) ?? '—'}</strong></div><div><span>SCORE CHANGE</span><strong className="change-value">{response.vci[selectedCell] ? signed(response.originalSimilarity - response.vci[selectedCell].maskedSimilarity) : '—'}</strong></div></div>
-              <div className="grid-table"><div className="grid-table-head"><span>Region</span><span>Masked score</span><span>Change</span></div>{response.vci.map((cell, index) => <VciRow key={`${cell.row}-${cell.column}`} cell={cell} original={response.originalSimilarity} selected={index === selectedCell} onClick={() => setSelectedCell(index)} />)}</div>
-              <p className="formula-note">Score change = original similarity − masked similarity</p>
+              <div className="vci-stats"><div><span>ORIGINAL SIMILARITY</span><strong>{selectedOriginal.toFixed(4)}</strong></div><div><span>MASKED SIMILARITY</span><strong>{response.vci?.[selectedCell]?.maskedSimilarity.toFixed(4) ?? '—'}</strong></div><div><span>SCORE CHANGE</span><strong className="change-value">{response.vci?.[selectedCell] ? signed(selectedOriginal - response.vci[selectedCell].maskedSimilarity) : '—'}</strong></div></div>
+              {response.vci?.length ? <>
+                <div className="heatmap-wrap">{preview ? <img src={preview} alt="Selected image with region contribution grid overlay" /> : null}<div className="heatmap-grid">{response.vci.map((cell, index) => { const change = selectedOriginal - cell.maskedSimilarity; return <button key={`${cell.row}-${cell.column}`} onClick={() => setSelectedCell(index)} className={`heat-cell ${change > 0 ? 'heat-positive' : 'heat-negative'} ${selectedCell === index ? 'heat-selected' : ''}`} style={{ opacity: 0.20 + Math.min(Math.abs(change) * 4, 0.62) }} title={`Row ${cell.row}, column ${cell.column}: original ${selectedOriginal.toFixed(4)}, masked ${cell.maskedSimilarity.toFixed(4)}, change ${change > 0 ? '+' : ''}${change.toFixed(4)}`} aria-label={`Row ${cell.row}, column ${cell.column}; score change ${change > 0 ? 'positive' : 'negative'} ${Math.abs(change).toFixed(4)}`} />; })}</div><span className="grid-caption">4 × 4 region grid</span></div>
+                <div className="legend"><span><i className="legend-positive" /> Positive change</span><span><i className="legend-negative" /> Negative change</span></div>
+                <div className="grid-table"><div className="grid-table-head"><span>Region</span><span>Masked score</span><span>Change</span></div>{response.vci.map((cell, index) => <VciRow key={`${cell.row}-${cell.column}`} cell={cell} original={selectedOriginal} selected={index === selectedCell} onClick={() => setSelectedCell(index)} />)}</div>
+                <p className="formula-note">Score change = original similarity − masked similarity</p>
+              </> : <div className="vci-unavailable"><Sparkles size={16} /><strong>VCI analysis is not available yet</strong><p>The backend currently returns image similarity scores only. Region masking will appear here when the VCI endpoint is ready. Score change = original similarity − masked similarity.</p></div>}
             </div>
           </div>
         </section>}
@@ -133,7 +145,12 @@ function App() {
   );
 }
 
-function signed(value: number) { return `${value > 0 ? '+' : ''}${value.toFixed(3)}`; }
+function signed(value: number) { return `${value > 0 ? '+' : ''}${value.toFixed(4)}`; }
+function relativeWidth(scores: number[], score: number) {
+  const low = Math.min(...scores);
+  const high = Math.max(...scores);
+  return high === low ? 100 : Math.round(18 + ((score - low) / (high - low)) * 82);
+}
 function VciRow({ cell, original, selected, onClick }: { cell: VciCell; original: number; selected: boolean; onClick: () => void }) {
   const change = original - cell.maskedSimilarity;
   return <button className={`grid-table-row ${selected ? 'grid-row-selected' : ''}`} onClick={onClick}><span>R{cell.row} · C{cell.column}</span><span>{cell.maskedSimilarity.toFixed(3)}</span><strong className={change >= 0 ? 'positive-text' : 'negative-text'}>{signed(change)}</strong></button>;

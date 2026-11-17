@@ -1,0 +1,48 @@
+.vci-unavailable {
+  min-height: 155px;
+  padding: 18px 12px;
+  border: 1px dashed rgba(149, 171, 213, .2);
+  border-radius: 7px;
+  background: rgba(8, 13, 27, .24);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8px;
+  color: #a68aff;
+}
+
+.vci-unavailable strong {
+  color: #d8deec;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.vci-unavailable p {
+  color: #8290a8;
+  font-size: 9px;
+  line-height: 1.6;
+  max-width: 340px;
+}
+
+.service-mock {
+  border-color: rgba(214, 177, 111, .2);
+  background: rgba(103, 78, 41, .12);
+  color: #d2b98b;
+}
+
+.service-mock .service-dot {
+  background: #d2ad71;
+  box-shadow: 0 0 7px #d2ad71;
+}
+
+.service-offline {
+  border-color: rgba(226, 125, 145, .2);
+  background: rgba(94, 35, 52, .16);
+  color: #d69ba6;
+}
+
+.service-offline .service-dot {
+  background: #d47d8b;
+  box-shadow: 0 0 7px #d47d8b;
+}

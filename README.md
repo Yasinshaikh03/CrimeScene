@@ -1,21 +1,22 @@
-# CrimeScene · Photo Analysis
+# CrimeScene
 
-Photo analysis UI built with React, Vite, TypeScript, and CSS.
+CrimeScene compares images and video with natural-language descriptions using CLIP, with Visual Counterfactual Intelligence (VCI) planned for image-region analysis.
 
-## Run locally
+## Photo Analysis frontend
 
-In Windows PowerShell, from the `CrimeScene` repository directory:
+The React, Vite, and TypeScript app is in `frontend/`.
 
 ```powershell
-npm install
+Set-Location .\frontend
+npm ci
 Copy-Item .env.example .env
 npm run dev
 ```
 
-The app opens in Vite's local development server. Mock mode is enabled by default so the UI can be reviewed before the backend contract is available. Mock responses are separate from the API service and are visibly labelled in the results.
+Mock mode is enabled by default and clearly labels illustrative UI data. Set `VITE_USE_MOCKS=false` to connect the image-analysis page to the FastAPI backend at `VITE_API_BASE_URL` (default `http://localhost:8000`). The frontend uses the confirmed `POST /api/analyze/image` contract.
 
-## Backend integration status
+The current backend returns image similarity scores. Its VCI route is not implemented yet, so live mode shows a pending state for region masking rather than mock heatmap data.
 
-The expected endpoints are `GET /api/health`, `POST /api/analyze/image`, and `POST /api/analyze/image/vci`. The request and response field names are not defined here. Live request handling must be completed after Yasin confirms the API contract; the UI does not claim to connect to the backend while mock mode is enabled.
+## Backend
 
-Set `VITE_API_BASE_URL` and `VITE_USE_MOCKS=false` in `.env` only after that contract has been confirmed and implemented in `src/api.ts`.
+The FastAPI service is in `backend/`.

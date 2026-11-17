@@ -1,0 +1,14 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+.pytest_cache/
+.vscode/
+.idea/
+node_modules/
+dist/
+*.mp4
+*.avi
+*.pth
+*.pt

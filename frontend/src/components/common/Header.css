@@ -117,16 +117,6 @@
   font-weight: 600;
 }
 
-.nav-badge-sudev {
-  font-size: 9.5px;
-  padding: 2px 5px;
-  border-radius: 4px;
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  color: #fbbf24;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-}
 
 /* System status indicator */
 .header-status {
@@ -147,6 +137,12 @@
   border-radius: 9999px;
 }
 
+.status-indicator.warning {
+  border-color: rgba(245, 158, 11, 0.25);
+  background: rgba(245, 158, 11, 0.08);
+  color: #fbbf24;
+}
+
 .status-dot {
   width: 7px;
   height: 7px;
@@ -154,6 +150,11 @@
   background-color: var(--accent-emerald);
   box-shadow: 0 0 8px var(--accent-emerald);
   animation: pulse-dot 2s infinite;
+}
+
+.status-dot.warning {
+  background-color: var(--accent-amber);
+  box-shadow: 0 0 8px var(--accent-amber);
 }
 
 @keyframes pulse-dot {

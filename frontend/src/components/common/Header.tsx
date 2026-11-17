@@ -43,15 +43,14 @@ export const Header: React.FC<NavigationProps> = ({ activeTab, onTabChange }) =>
           >
             <ImageIcon size={16} />
             <span>Photo Analysis</span>
-            <span className="nav-badge-sudev">Sudev</span>
           </button>
         </nav>
 
         {/* System & Model Status */}
         <div className="header-status">
-          <div className="status-indicator">
-            <span className="status-dot"></span>
-            <span>ViT-B/32 Ready</span>
+          <div className="status-indicator warning">
+            <span className="status-dot warning"></span>
+            <span>Backend: Not Connected</span>
           </div>
         </div>
       </div>

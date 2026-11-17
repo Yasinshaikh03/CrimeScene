@@ -171,7 +171,7 @@ export const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
               disabled={disabled}
               className="styled-slider"
             />
-            <span className="setting-hint">Scores above this threshold are highlighted as high-confidence matches.</span>
+            <span className="setting-hint">Scores above this threshold are highlighted as higher-similarity matches.</span>
           </div>
 
           {/* Visual Counterfactual Intelligence (VCI) Toggle */}

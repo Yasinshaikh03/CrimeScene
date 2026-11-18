@@ -18,8 +18,8 @@ import { FrameDetails } from './components/FrameDetails'
 import { SimilarityResults } from './components/SimilarityResults'
 import { VCIHeatmap } from './components/VCIHeatmap'
 import { ErrorMessage } from './components/ErrorMessage'
-import { runMockVideoAnalysis } from './services/mockVideoService'
-import { VideoIcon, InfoIcon } from '../../components/common/Icons'
+import { analyzeVideoWithBackend } from './services/videoService'
+import { VideoIcon, SparklesIcon } from '../../components/common/Icons'
 import './VideoAnalysis.css'
 
 const DEFAULT_PROMPTS: CandidateDescription[] = [
@@ -30,8 +30,8 @@ const DEFAULT_PROMPTS: CandidateDescription[] = [
 
 const DEFAULT_CONFIG: AnalysisConfig = {
   sampleRate: 0.5, // 1 frame every 2 seconds
-  confidenceThreshold: 0.5,
-  enableVCI: true
+  confidenceThreshold: 0.4,
+  enableVCI: false // Spatiotemporal VCI unavailable on video streams
 }
 
 export const VideoAnalysisPage: React.FC = () => {
@@ -120,7 +120,7 @@ export const VideoAnalysisPage: React.FC = () => {
 
     try {
       const promptTexts = descriptions.map((d) => d.text)
-      const analysisOutput = await runMockVideoAnalysis(
+      const analysisOutput = await analyzeVideoWithBackend(
         videoFile,
         promptTexts,
         config,
@@ -157,9 +157,9 @@ export const VideoAnalysisPage: React.FC = () => {
             <VideoIcon size={13} />
             Forensic Video Stream Module
           </span>
-          <span className="simulation-pill">
-            <InfoIcon size={12} />
-            Frontend Simulation Mode (Awaiting Backend Route)
+          <span className="live-api-pill">
+            <SparklesIcon size={12} className="icon-cyan" />
+            FastAPI + PyTorch CLIP Backend Active
           </span>
         </div>
 

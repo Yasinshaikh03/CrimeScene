@@ -41,6 +41,50 @@
   text-transform: uppercase;
 }
 
+.live-api-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+  color: #38bdf8;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.vci-unavailable-tag {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.disabled-vci {
+  opacity: 0.75;
+}
+
+.switch.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.slider.round.disabled {
+  cursor: not-allowed;
+  background-color: #334155;
+}
+
 .hero-title {
   font-size: 34px;
   font-weight: 700;

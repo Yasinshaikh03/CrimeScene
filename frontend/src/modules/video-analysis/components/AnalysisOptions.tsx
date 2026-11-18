@@ -174,25 +174,26 @@ export const AnalysisOptions: React.FC<AnalysisOptionsProps> = ({
             <span className="setting-hint">Scores above this threshold are highlighted as higher-similarity matches.</span>
           </div>
 
-          {/* Visual Counterfactual Intelligence (VCI) Toggle */}
-          <div className="setting-toggle-row">
+          {/* Visual Counterfactual Intelligence (VCI) Toggle - Disabled / Unavailable for Video */}
+          <div className="setting-toggle-row disabled-vci">
             <div className="toggle-info">
               <div className="toggle-title-wrap">
                 <FlameIcon size={16} className="icon-rose" />
                 <span className="toggle-title">Visual Counterfactual Intelligence (VCI)</span>
+                <span className="vci-unavailable-tag">Unavailable for Video</span>
               </div>
               <p className="toggle-desc">
-                Synthesize forensic counterfactual heatmaps showing salient spatial regions driving CLIP similarity.
+                Spatiotemporal video VCI requires high-performance GPU tensor masking and is currently unavailable on video streams. Image VCI is fully operational on the Photo Analysis module.
               </p>
             </div>
-            <label className="switch">
+            <label className="switch disabled" title="Video VCI is currently unavailable">
               <input
                 type="checkbox"
-                checked={config.enableVCI}
-                onChange={(e) => onUpdateConfig({ enableVCI: e.target.checked })}
-                disabled={disabled}
+                checked={false}
+                disabled={true}
+                readOnly
               />
-              <span className="slider round"></span>
+              <span className="slider round disabled"></span>
             </label>
           </div>
         </div>

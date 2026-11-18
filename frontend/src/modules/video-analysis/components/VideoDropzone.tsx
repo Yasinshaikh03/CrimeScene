@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { UploadCloudIcon, VideoIcon } from '../../../components/common/Icons'
-import { formatBytes } from '../services/mockVideoService'
+import { formatBytes } from '../services/videoService'
 
 interface VideoDropzoneProps {
   onVideoSelected: (file: File) => void

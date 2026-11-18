@@ -636,3 +636,145 @@
     opacity: 0.5;
   }
 }
+
+.photo-analysis-page .dropzone {
+  cursor: default;
+}
+
+.photo-analysis-page .dropzone-browse {
+  border: 1px solid rgba(153, 198, 224, 0.24);
+  border-radius: 6px;
+  padding: 7px 11px;
+  color: #b9d9ee;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.photo-analysis-page .dropzone-browse:hover {
+  background: rgba(114, 213, 222, 0.1);
+}
+
+.photo-analysis-page .description-guidance {
+  margin: -7px 0 12px;
+  color: #8290a8;
+  font-size: 11px;
+}
+
+.photo-analysis-page .mock-notice {
+  border: 1px solid rgba(214, 177, 111, 0.2);
+  border-radius: 7px;
+  margin-bottom: 12px;
+  padding: 9px 11px;
+  color: #d2b98b;
+  background: rgba(103, 78, 41, 0.12);
+  font-size: 10px;
+}
+
+.photo-analysis-page .grid-table {
+  margin-top: 12px;
+}
+
+.photo-analysis-page .grid-table-head,
+.photo-analysis-page .grid-table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 0.65fr;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 6px;
+}
+
+.photo-analysis-page .grid-table-head {
+  color: #77839d;
+  font-size: 9px;
+}
+
+.photo-analysis-page .grid-table-row {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid rgba(160, 175, 212, 0.08);
+  background: transparent;
+  color: #abb8cd;
+  font-size: 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.photo-analysis-page .grid-table-row:hover,
+.photo-analysis-page .grid-table-row.grid-row-selected {
+  background: rgba(113, 132, 181, 0.08);
+}
+
+.photo-analysis-page .grid-table-row strong {
+  text-align: right;
+}
+
+.photo-analysis-page .positive-text {
+  color: #90d6b2;
+}
+
+.photo-analysis-page .negative-text {
+  color: #e49ba6;
+}
+
+.photo-analysis-page .formula-note {
+  margin: 8px 0 0;
+  color: #697690;
+  font-size: 9px;
+}
+
+@media (max-width: 760px) {
+  .photo-analysis-page .page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .photo-analysis-page .workspace-grid,
+  .photo-analysis-page .result-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .photo-analysis-page .panel {
+    min-width: 0;
+  }
+
+  .photo-analysis-page .section-head {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .photo-analysis-page {
+    padding: 0 12px 28px;
+  }
+
+  .photo-analysis-page h1 {
+    font-size: 24px;
+  }
+
+  .photo-analysis-page .intro {
+    font-size: 12px;
+  }
+
+  .photo-analysis-page .panel {
+    padding: 15px;
+  }
+
+  .photo-analysis-page .section-title {
+    font-size: 13px;
+  }
+
+  .photo-analysis-page .vci-stats span {
+    font-size: 8px;
+    letter-spacing: 0.25px;
+  }
+
+  .photo-analysis-page .grid-table-head,
+  .photo-analysis-page .grid-table-row {
+    grid-template-columns: 0.85fr 1fr 0.7fr;
+    gap: 5px;
+    padding-inline: 3px;
+    font-size: 9px;
+  }
+}

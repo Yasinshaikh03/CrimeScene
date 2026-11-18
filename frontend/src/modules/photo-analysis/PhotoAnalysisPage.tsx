@@ -232,19 +232,27 @@ export const PhotoAnalysisPage: React.FC = () => {
                 setDragging(false);
                 acceptFile(e.dataTransfer.files[0]);
               }}
-              onClick={() => inputRef.current?.click()}
             >
               <UploadCloud size={32} className="dropzone-icon" />
               <p className="dropzone-title">Upload Evidence Image</p>
-              <p className="dropzone-hint">
-                Drag and drop your photographic evidence file here, or click to browse
-              </p>
+              <p className="dropzone-hint">Drag and drop your image here, or</p>
+              <button
+                type="button"
+                className="dropzone-browse"
+                onClick={() => inputRef.current?.click()}
+              >
+                Browse files
+              </button>
               <input
                 ref={inputRef}
                 type="file"
                 accept=".jpg,.jpeg,.png"
                 style={{ display: 'none' }}
-                onChange={(e) => acceptFile(e.target.files?.[0])}
+                aria-label="Choose a JPG or PNG image"
+                onChange={(e) => {
+                  acceptFile(e.target.files?.[0]);
+                  e.currentTarget.value = '';
+                }}
               />
             </div>
           ) : (
@@ -279,6 +287,9 @@ export const PhotoAnalysisPage: React.FC = () => {
             <h3 className="section-title">Forensic Candidate Descriptions</h3>
             <span className="section-meta">{descriptions.length} Hypotheses</span>
           </div>
+          <p className="description-guidance">
+            Use clear, neutral descriptions. Up to 20 prompts, 500 characters each.
+          </p>
 
           <div className="descriptions-list">
             {descriptions.map((desc, idx) => (
@@ -289,6 +300,8 @@ export const PhotoAnalysisPage: React.FC = () => {
                   className="desc-input"
                   value={desc}
                   placeholder={`Candidate hypothesis #${idx + 1}...`}
+                  aria-label={`Description ${idx + 1}`}
+                  maxLength={500}
                   onChange={(e) => updateDescription(idx, e.target.value)}
                   disabled={loading}
                 />
@@ -309,7 +322,7 @@ export const PhotoAnalysisPage: React.FC = () => {
             type="button"
             className="btn-add-desc"
             onClick={addDescription}
-            disabled={loading || descriptions.length >= 10}
+            disabled={loading || descriptions.length >= 20}
           >
             <Plus size={14} /> Add Candidate Description
           </button>
@@ -322,7 +335,7 @@ export const PhotoAnalysisPage: React.FC = () => {
           type="button"
           className="analyze-button"
           onClick={submit}
-          disabled={loading || !image || !descriptions.some((d) => d.trim())}
+          disabled={loading || !image}
         >
           {loading ? (
             <>
@@ -339,6 +352,11 @@ export const PhotoAnalysisPage: React.FC = () => {
       {/* Analysis Results */}
       {response && (
         <section className="results-section">
+          {useMocks && (
+            <div className="mock-notice" role="status">
+              Illustrative mock data for interface review only; these are not model results.
+            </div>
+          )}
           <div className="result-layout">
             {/* Left: Ranked Descriptions */}
             <div className="panel score-panel">
@@ -466,6 +484,35 @@ export const PhotoAnalysisPage: React.FC = () => {
                       <i className="legend-negative" /> Negative change
                     </span>
                   </div>
+                  <div className="grid-table" aria-label="VCI masked similarity results">
+                    <div className="grid-table-head">
+                      <span>Region</span>
+                      <span>Masked score</span>
+                      <span>Change</span>
+                    </div>
+                    {response.vci.map((cell, index) => {
+                      const change = selectedOriginal - cell.maskedSimilarity;
+                      return (
+                        <button
+                          key={`${cell.row}-${cell.column}`}
+                          type="button"
+                          className={`grid-table-row ${
+                            selectedCell === index ? 'grid-row-selected' : ''
+                          }`}
+                          onClick={() => setSelectedCell(index)}
+                        >
+                          <span>R{cell.row} · C{cell.column}</span>
+                          <span>{cell.maskedSimilarity.toFixed(4)}</span>
+                          <strong className={change >= 0 ? 'positive-text' : 'negative-text'}>
+                            {signed(change)}
+                          </strong>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="formula-note">
+                    Score change = original similarity − masked similarity
+                  </p>
                 </>
               ) : (
                 <div className="vci-unavailable">

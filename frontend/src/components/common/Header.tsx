@@ -1,9 +1,30 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import type { NavigationProps } from '../../types/navigation'
 import { ShieldAlertIcon, VideoIcon, ImageIcon } from './Icons'
 import './Header.css'
 
 export const Header: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
+  const [backendOnline, setBackendOnline] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    let ignore = false
+    const check = () => {
+      fetch('/api/health')
+        .then((res) => {
+          if (!ignore) setBackendOnline(res.ok)
+        })
+        .catch(() => {
+          if (!ignore) setBackendOnline(false)
+        })
+    }
+    check()
+    const timer = setInterval(check, 10000)
+    return () => {
+      ignore = true
+      clearInterval(timer)
+    }
+  }, [])
+
   return (
     <header className="header">
       <div className="header-container">
@@ -48,10 +69,22 @@ export const Header: React.FC<NavigationProps> = ({ activeTab, onTabChange }) =>
 
         {/* System & Model Status */}
         <div className="header-status">
-          <div className="status-indicator warning">
-            <span className="status-dot warning"></span>
-            <span>Backend: Not Connected</span>
-          </div>
+          {backendOnline === true ? (
+            <div className="status-indicator online">
+              <span className="status-dot online"></span>
+              <span>FastAPI Backend: Online</span>
+            </div>
+          ) : backendOnline === false ? (
+            <div className="status-indicator warning">
+              <span className="status-dot warning"></span>
+              <span>FastAPI Backend: Offline</span>
+            </div>
+          ) : (
+            <div className="status-indicator">
+              <span className="status-dot"></span>
+              <span>Checking Backend...</span>
+            </div>
+          )}
         </div>
       </div>
     </header>

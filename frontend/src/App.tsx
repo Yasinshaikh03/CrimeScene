@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Header } from './components/common/Header'
 import type { ActiveTab } from './types/navigation'
 import { VideoAnalysisPage } from './modules/video-analysis/VideoAnalysisPage'
-import { SudevPlaceholder } from './components/common/SudevPlaceholder'
+import { PhotoAnalysisPage } from './modules/photo-analysis/PhotoAnalysisPage'
 import './App.css'
 
 function App() {
@@ -16,7 +16,7 @@ function App() {
       {/* Main View Router / Tab Switcher */}
       <div className="app-content">
         {activeTab === 'video-analysis' && <VideoAnalysisPage />}
-        {activeTab === 'photo-analysis' && <SudevPlaceholder />}
+        {activeTab === 'photo-analysis' && <PhotoAnalysisPage />}
       </div>
 
       {/* Forensic Disclaimer Footer */}

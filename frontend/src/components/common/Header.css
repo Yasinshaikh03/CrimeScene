@@ -143,6 +143,12 @@
   color: #fbbf24;
 }
 
+.status-indicator.online {
+  border-color: rgba(16, 185, 129, 0.25);
+  background: rgba(16, 185, 129, 0.08);
+  color: #34d399;
+}
+
 .status-dot {
   width: 7px;
   height: 7px;
@@ -150,6 +156,11 @@
   background-color: var(--accent-emerald);
   box-shadow: 0 0 8px var(--accent-emerald);
   animation: pulse-dot 2s infinite;
+}
+
+.status-dot.online {
+  background-color: #10b981;
+  box-shadow: 0 0 8px #10b981;
 }
 
 .status-dot.warning {
